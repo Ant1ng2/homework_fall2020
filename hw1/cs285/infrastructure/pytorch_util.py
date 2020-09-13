@@ -3,6 +3,8 @@ from typing import Union
 import torch
 from torch import nn
 
+from collections import OrderedDict
+
 Activation = Union[str, nn.Module]
 
 
@@ -47,8 +49,16 @@ def build_mlp(
 
     # TODO: return a MLP. This should be an instance of nn.Module
     # Note: nn.Sequential is an instance of nn.Module.
-    raise NotImplementedError
+    order = OrderedDict()
+    order['linStart'] = nn.Linear(input_size, size)
+    order['actStart'] = activation
+    for i in range(1, n_layers):
+        order['lin' + str(i)] = nn.Linear(size, size)
+        order['act' + str(i)] = activation
 
+    order['linEnd'] = nn.Linear(size, output_size)
+    order['actEnd'] = output_activation
+    return nn.Sequential(order)
 
 device = None
 
